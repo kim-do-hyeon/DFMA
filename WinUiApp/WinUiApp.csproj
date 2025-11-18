@@ -71,11 +71,13 @@
     <None Remove="Assets\Icons\SmallTile.scale-200.png" />
     <None Remove="Assets\Icons\SmallTile.scale-400.png" />
     <None Remove="Assets\Icons\Wide310x150Logo.scale-400.png" />
-    <None Remove="Pages\ArtifactsAnalysis\CaseImformation.xaml" />
-    <None Remove="Pages\CaseAnalysis\EvidenceProcess\EvidenceProcess.xaml" />
-    <None Remove="Pages\CaseAnalysis\EvidenceSource\DynamicDisk.xaml" />
-    <None Remove="Pages\CaseAnalysis\EvidenceSource\RemoteDisk.xaml" />
-    <None Remove="Pages\CaseAnalysis\EvidenceSource\StaticImage.xaml" />
+    <None Remove="Pages\EvidenceAnalysis\ArtifactsAnalysis\EventlogAnalysis.xaml" />
+    <None Remove="Pages\EvidenceAnalysis\CaseImformation.xaml" />
+    <None Remove="Pages\EvidenceAnalysis\FilesystemAnalysis\FilesystemAnalysis.xaml" />
+    <None Remove="Pages\PreparingEvidence\EvidenceProcess\EvidenceProcess.xaml" />
+    <None Remove="Pages\PreparingEvidence\EvidenceSource\DynamicDisk.xaml" />
+    <None Remove="Pages\PreparingEvidence\EvidenceSource\RemoteDisk.xaml" />
+    <None Remove="Pages\PreparingEvidence\EvidenceSource\StaticImage.xaml" />
     <None Remove="Pages\Settings\Settings.xaml" />
     <None Remove="Pages\StartPage.xaml" />
   </ItemGroup>
@@ -104,7 +106,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\CaseAnalysisPage.xaml">
+    <Page Update="Pages\PreparingEvidence.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -114,7 +116,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\ArtifactsAnalysisPage.xaml">
+    <Page Update="Pages\EvidenceAnalysis.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -157,7 +159,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\CaseAnalysis\EvidenceCase\" />
+    <Folder Include="Pages\PreparingEvidence\EvidenceCase\" />
+    <Folder Include="Pages\EvidenceAnalysis\EvidenceCase\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Pages\EvidenceAnalysis\FilesystemAnalysis\FilesystemAnalysis.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Pages\EvidenceAnalysis\ArtifactsAnalysis\EventlogAnalysis.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\korea\\OneDrive\\Desktop\\DFMA\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}|WinUiApp\\WinUiApp.csproj|c:\\users\\korea\\onedrive\\desktop\\dfma\\winuiapp\\pages\\caseanalysis\\evidencecase\\createcasepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}|WinUiApp\\WinUiApp.csproj|solutionrelative:winuiapp\\pages\\caseanalysis\\evidencecase\\createcasepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}|WinUiApp\\WinUiApp.csproj|c:\\users\\korea\\onedrive\\desktop\\dfma\\winuiapp\\winuiapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}|WinUiApp\\WinUiApp.csproj|solutionrelative:winuiapp\\winuiapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CreateCasePage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\korea\\OneDrive\\Desktop\\DFMA\\WinUiApp\\Pages\\CaseAnalysis\\EvidenceCase\\CreateCasePage.xaml.cs",
+              "RelativeDocumentMoniker": "WinUiApp\\Pages\\CaseAnalysis\\EvidenceCase\\CreateCasePage.xaml.cs",
+              "ToolTip": "C:\\Users\\korea\\OneDrive\\Desktop\\DFMA\\WinUiApp\\Pages\\CaseAnalysis\\EvidenceCase\\CreateCasePage.xaml.cs",
+              "RelativeToolTip": "WinUiApp\\Pages\\CaseAnalysis\\EvidenceCase\\CreateCasePage.xaml.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAEwCIAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-18T02:39:10.567Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WinUiApp",
+              "DocumentMoniker": "C:\\Users\\korea\\OneDrive\\Desktop\\DFMA\\WinUiApp\\WinUiApp.csproj",
+              "RelativeDocumentMoniker": "WinUiApp\\WinUiApp.csproj",
+              "ToolTip": "C:\\Users\\korea\\OneDrive\\Desktop\\DFMA\\WinUiApp\\WinUiApp.csproj",
+              "RelativeToolTip": "WinUiApp\\WinUiApp.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-18T02:39:04.068Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
