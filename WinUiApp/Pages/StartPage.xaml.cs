@@ -1,5 +1,11 @@
+using System;
+using System.IO;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
+using WinUiApp.Pages.ArtifactsAnalysis;
+using WinUiApp.Pages.CaseAnalysis;
 
 namespace WinUiApp.Pages
 {
@@ -10,7 +16,7 @@ namespace WinUiApp.Pages
             InitializeComponent();
         }
 
-        private void CreateCase_Button_Click(object sender, RoutedEventArgs e)  // ÄÉÀÌ½º »ı¼º ÆäÀÌÁö ·Îµå
+        private void CreateCase_Button_Click(object sender, RoutedEventArgs e) 
         {
             var window = App.MainWindowInstance as MainWindow;
 
@@ -20,14 +26,54 @@ namespace WinUiApp.Pages
             }
         }
 
-        private void OpenCase_Button_Click(object sender, RoutedEventArgs e)  // ¾ÆÆ¼ÆÑÆ® ºĞ¼® ÆäÀÌÁö ·Îµå
+        private async void OpenCase_Button_Click(object sender, RoutedEventArgs e)
         {
             var window = App.MainWindowInstance as MainWindow;
 
-            if (window != null)
+            if (window == null)
             {
-                window.RootFrameControl.Navigate(typeof(ArtifactsAnalysisPage));
+                return;
             }
+
+            string? caseRoot = null;
+
+            var picker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.List
+            };
+
+            var hwnd = WindowNative.GetWindowHandle(App.MainWindowInstance);
+            InitializeWithWindow.Initialize(picker, hwnd);
+
+            picker.FileTypeFilter.Add(".dfmadb");
+
+            var file = await picker.PickSingleFileAsync();
+            if (file == null)
+            {
+                return;
+            }
+
+            caseRoot = Path.GetDirectoryName(file.Path);
+
+            if (!string.IsNullOrWhiteSpace(caseRoot))
+            {
+                var dbPath = Path.Combine(caseRoot, "DFMA-Case.dfmadb");
+                if (File.Exists(dbPath))
+                {
+                    window.RootFrameControl.Navigate(typeof(CaseReportPage), caseRoot);
+                    return;
+                }
+            }
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "ì¼€ì´ìŠ¤ë¥¼ ë¡œë“œí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤",
+                Content = "ì„ íƒí•œ ê²½ë¡œì—ì„œ DFMA-Case.dfmadb íŒŒì¼ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ë‹¤ì‹œ ì„ íƒí•´ ì£¼ì„¸ìš”.",
+                CloseButtonText = "í™•ì¸"
+            };
+
+            await dialog.ShowAsync();
         }
     }
 }

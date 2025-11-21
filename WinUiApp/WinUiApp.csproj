@@ -132,6 +132,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Pages\EvidenceAnalysis\EvidenceCase\CaseReportPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- dll 폴더 전체 + 모든 하위 디렉터리 및 파일 포함 -->
     <Content Include="dll\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
