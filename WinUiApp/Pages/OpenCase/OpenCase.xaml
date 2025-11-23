@@ -171,13 +171,13 @@
                     </NavigationViewItem.Icon>
 
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="파일 시스템" Tag="FilesystemAnalysis">
+                        <NavigationViewItem Content="파일 시스템" Tag="FileSystemAnalysis">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xED25;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
 
-                        <NavigationViewItem Content="파일 시스템 로그" Tag="FilesystemLogAnalysis">
+                        <NavigationViewItem Content="파일 시스템 로그" Tag="FileSystemLogAnalysis">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xEA37;" />
                             </NavigationViewItem.Icon>

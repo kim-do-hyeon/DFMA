@@ -6,14 +6,16 @@ using System.IO;
 using System.Linq;
 
 using WinUiApp.Interop;
-using WinUiApp.Pages;
-using WinUiApp.Pages.CaseAnalysis;
+using WinUiApp.Pages;                  // ArtifactsAnalysisPage
+using WinUiApp.Pages.CaseAnalysis;     // CreateCasePage 등(이미 가지고 있다면 유지)
 
 namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
 {
     public sealed partial class EvidenceProcess : Page
     {
+        // ─────────────────────────────────────────────
         //  페이지 간 이동 후에도 유지할 static 상태
+        // ─────────────────────────────────────────────
         private static bool? _artifactAllSaved;
         private static bool? _browserAllSaved;
         private static bool? _commAllSaved;
@@ -35,7 +37,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             _isLoading = false;
         }
 
+        // ─────────────────────────────────────────────
         //  공용 함수
+        // ─────────────────────────────────────────────
         private void SetChildren(CheckBox[] children, bool? value)
         {
             foreach (var c in children)
@@ -55,7 +59,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
                 parent.IsChecked = null; // Indeterminate
         }
 
+        // ─────────────────────────────────────────────
         //  체크박스 배열
+        // ─────────────────────────────────────────────
         private CheckBox[] ArtifactChildren => new[]
         {
             Artifact_EventLog, Artifact_Prefetch, Artifact_JumpList,
@@ -66,7 +72,7 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
         private CheckBox[] BrowserChildren => new[]
         {
             Browser_Search, Browser_Visit, Browser_Download,
-            Browser_Cache, Browser_Cookie
+            Browser_Cache,  Browser_Cookie
         };
 
         private CheckBox[] CommChildren => new[]
@@ -79,7 +85,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             Timeline_Main
         };
 
+        // ─────────────────────────────────────────────
         //  상태 저장 / 불러오기
+        // ─────────────────────────────────────────────
         private void SaveState()
         {
             if (_isLoading) return;
@@ -130,7 +138,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
                     TimelineChildren[i].IsChecked = _timelineSaved[i];
         }
 
+        // ─────────────────────────────────────────────
         //  아티팩트 분석
+        // ─────────────────────────────────────────────
         private void SelectAllArtifact_Checked(object sender, RoutedEventArgs e)
         {
             SetChildren(ArtifactChildren, true);
@@ -157,7 +167,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             SaveState();
         }
 
+        // ─────────────────────────────────────────────
         //  브라우저 분석
+        // ─────────────────────────────────────────────
         private void SelectAllBrowser_Checked(object sender, RoutedEventArgs e)
         {
             SetChildren(BrowserChildren, true);
@@ -184,7 +196,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             SaveState();
         }
 
+        // ─────────────────────────────────────────────
         //  커뮤니케이션 분석
+        // ─────────────────────────────────────────────
         private void SelectAllComm_Checked(object sender, RoutedEventArgs e)
         {
             SetChildren(CommChildren, true);
@@ -211,7 +225,9 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             SaveState();
         }
 
+        // ─────────────────────────────────────────────
         //  타임라인 분석
+        // ─────────────────────────────────────────────
         private void SelectAllTimeline_Checked(object sender, RoutedEventArgs e)
         {
             SetChildren(TimelineChildren, true);
@@ -238,30 +254,28 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
             SaveState();
         }
 
-        //  "증거 분석" 버튼 클릭 → DB 저장
+        // ─────────────────────────────────────────────
+        //  "증거 분석" 버튼 클릭 → DB 저장 + 케이스 열기
+        // ─────────────────────────────────────────────
         private async void EvidenceAnalyzeButton_Click(object sender, RoutedEventArgs e)
         {
-            // 현재 체크 상태 static에 반영
             SaveState();
 
-            // 1) 현재 케이스 폴더 절대 경로 가져오기
-            var caseRoot = CreateCasePage.CurrentCaseRoot;
-
+            // 1) 현재 케이스 루트 경로
+            var caseRoot = CreateCasePage.CurrentCaseRoot;  // 이미 만들어두셨다고 가정
             if (string.IsNullOrEmpty(caseRoot))
             {
                 await new ContentDialog
                 {
                     XamlRoot = this.XamlRoot,
                     Title = "케이스 정보 없음",
-                    Content = "케이스 폴더 정보를 찾을 수 없습니다.\n먼저 케이스를 생성한 후 다시 시도해 주세요.",
+                    Content = "현재 케이스 폴더 정보를 찾을 수 없습니다.\n먼저 케이스를 생성하거나 열어 주세요.",
                     CloseButtonText = "확인"
                 }.ShowAsync();
                 return;
             }
 
-            // 2) 실제 케이스 DB 경로 (예: C:\...\DFMA-Case.dfmadb)
             string dbPath = Path.Combine(caseRoot, "DFMA-Case.dfmadb");
-
             if (!File.Exists(dbPath))
             {
                 await new ContentDialog
@@ -274,7 +288,7 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
                 return;
             }
 
-            // 3) SQLite 열기
+            // 2) DB 열기
             IntPtr db;
             int flags = NativeSqliteHelper.SQLITE_OPEN_READWRITE;
             int rc = NativeSqliteHelper.sqlite3_open_v2(dbPath, out db, flags, null);
@@ -293,7 +307,7 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
 
             try
             {
-                // 테이블 없으면 생성
+                // 3) 테이블 생성
                 string createTableSql =
                     "CREATE TABLE IF NOT EXISTS artifacts_process (" +
                     " key   TEXT PRIMARY KEY," +
@@ -302,49 +316,42 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
 
                 NativeSqliteHelper.ExecNonQuery(db, createTableSql);
 
-                // 0 : 아티팩트 프로세싱 안함
-                // 1 : 아티팩트 프로세싱 함
-                // 2 : 아티팩트 프로세싱 중
-                // 3 : 아티팩트 프로세싱 완료
+                // 0: 파싱안함, 1: 파싱할예정, 2: 파싱하는중, 3: 파싱완료
                 int State(bool? b) => (b == true) ? 1 : 0;
 
                 var artifacts = new Dictionary<string, int>
-        {
-            // 아티팩트 분석
-            { "Artifact.EventLogAnalysis",          State(Artifact_EventLog.IsChecked) },
-            { "Artifact.PrefetchAnalysis",          State(Artifact_Prefetch.IsChecked) },
-            { "Artifact.JumpListAnalysis",          State(Artifact_JumpList.IsChecked) },
-            { "Artifact.LinkFileAnalysis",          State(Artifact_LinkFile.IsChecked) },
-            { "Artifact.PowerShellHistoryAnalysis", State(Artifact_PowerShellHistory.IsChecked) },
-            { "Artifact.NotificationCenterAnalysis",State(Artifact_NotificationCenter.IsChecked) },
-            { "Artifact.MRUAnalysis",               State(Artifact_MRU.IsChecked) },
-            { "Artifact.ShellBagAnalysis",          State(Artifact_ShellBag.IsChecked) },
-            { "Artifact.SrumAnalysis",              State(Artifact_SRUM.IsChecked) },
-            { "Artifact.AmCacheAnalysis",           State(Artifact_AmCache.IsChecked) },
+                {
+                    // 아티팩트 분석
+                    { "Artifact.EventLogAnalysis",          State(Artifact_EventLog.IsChecked) },
+                    { "Artifact.PrefetchAnalysis",          State(Artifact_Prefetch.IsChecked) },
+                    { "Artifact.JumpListAnalysis",          State(Artifact_JumpList.IsChecked) },
+                    { "Artifact.LinkFileAnalysis",          State(Artifact_LinkFile.IsChecked) },
+                    { "Artifact.PowerShellHistoryAnalysis", State(Artifact_PowerShellHistory.IsChecked) },
+                    { "Artifact.NotificationCenterAnalysis",State(Artifact_NotificationCenter.IsChecked) },
+                    { "Artifact.MRUAnalysis",               State(Artifact_MRU.IsChecked) },
+                    { "Artifact.ShellBagAnalysis",          State(Artifact_ShellBag.IsChecked) },
+                    { "Artifact.SrumAnalysis",              State(Artifact_SRUM.IsChecked) },
+                    { "Artifact.AmCacheAnalysis",           State(Artifact_AmCache.IsChecked) },
 
-            // 브라우저 분석
-            { "Browser.SearchAnalysis",             State(Browser_Search.IsChecked) },
-            { "Browser.VisitAnalysis",              State(Browser_Visit.IsChecked) },
-            { "Browser.DownloadAnalysis",           State(Browser_Download.IsChecked) },
-            { "Browser.CacheAnalysis",              State(Browser_Cache.IsChecked) },
-            { "Browser.CookieAnalysis",             State(Browser_Cookie.IsChecked) },
+                    // 브라우저 분석
+                    { "Browser.SearchAnalysis",             State(Browser_Search.IsChecked) },
+                    { "Browser.VisitAnalysis",              State(Browser_Visit.IsChecked) },
+                    { "Browser.DownloadAnalysis",           State(Browser_Download.IsChecked) },
+                    { "Browser.CacheAnalysis",              State(Browser_Cache.IsChecked) },
+                    { "Browser.CookieAnalysis",             State(Browser_Cookie.IsChecked) },
 
-            // 커뮤니케이션 분석
-            { "Communication.MailAnalysis",         State(Comm_Email.IsChecked) },
-            { "Communication.MessageAnalysis",      State(Comm_Message.IsChecked) },
-            { "Communication.CloudAnalysis",        State(Comm_Cloud.IsChecked) },
+                    // 커뮤니케이션 분석
+                    { "Communication.MailAnalysis",         State(Comm_Email.IsChecked) },
+                    { "Communication.MessageAnalysis",      State(Comm_Message.IsChecked) },
+                    { "Communication.CloudAnalysis",        State(Comm_Cloud.IsChecked) },
 
-            // 타임라인 분석
-            { "TimelineAnalysis.Main",              State(Timeline_Main.IsChecked) },
-        };
+                    // 타임라인 분석
+                    { "TimelineAnalysis.Main",              State(Timeline_Main.IsChecked) },
+                };
 
                 foreach (var kv in artifacts)
                 {
                     string key = kv.Key.Replace("'", "''");
-                    // 0 : 아티팩트 프로세싱 안함
-                    // 1 : 아티팩트 프로세싱 함
-                    // 2 : 아티팩트 프로세싱 중
-                    // 3 : 아티팩트 프로세싱 완료
                     int value = kv.Value;
 
                     string sql =
@@ -354,9 +361,11 @@ namespace WinUiApp.Pages.CaseAnalysis.EvidenceProcess
                     NativeSqliteHelper.ExecNonQuery(db, sql);
                 }
 
-                // 증거 분석에서 케이스 열기
+                // 4) 저장 성공 → "증거 분석에서 케이스 열기"
                 if (App.MainWindowInstance is MainWindow window)
                 {
+                    // StartPage → "케이스 열기" 와 동일한 페이지(ArtifactsAnalysisPage)를
+                    // 케이스 루트 경로를 인자로 넘겨서 연다.
                     window.RootFrameControl.Navigate(typeof(ArtifactsAnalysisPage), caseRoot);
                 }
             }

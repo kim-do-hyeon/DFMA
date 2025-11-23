@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -15,11 +15,14 @@ using WinUiApp.Interop;
 
 namespace WinUiApp.Pages.ArtifactsAnalysis
 {
+    // 페이지에서 케이스 정보 및 타임존을 관리하는 UI Page
     public sealed partial class CaseImformation : Page
     {
-        // ─────────────────────────────────────────────
-        //  내부용 모델: evidence_source 행
-        // ─────────────────────────────────────────────
+        public static string? CurrentCaseRoot { get; private set; }
+        public static string? CurrentDbPath { get; private set; }
+        public static string? CurrentTimezoneDisplay { get; private set; }
+
+        // evidence_source 행 모델
         private class EvidenceSourceItem
         {
             public long Id { get; set; }
@@ -27,9 +30,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             public string Value { get; set; } = string.Empty;
         }
 
-        // ─────────────────────────────────────────────
-        //  페이지 간 이동 후에도 유지할 static 상태
-        // ─────────────────────────────────────────────
+        // 페이지 간 상태 저장용 static 데이터
         private static string? _savedCaseRoot;
         private static string? _savedCaseName;
         private static string? _savedCaseCreateTime;
@@ -37,34 +38,36 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
         private bool _isLoading = false;
 
-        // 현재 케이스 루트 폴더 (예: C:\...\Cases\DFMA-Case-001)
+        // 현재 케이스 루트 경로 저장
         private string? _currentCaseRoot;
 
+        // 페이지 초기화 및 이전 상태 복원
         public CaseImformation()
         {
             this.InitializeComponent();
 
-            // 이전에 보던 내용이 있으면 복원
             _isLoading = true;
             LoadSavedState();
             _isLoading = false;
 
-            // 처음에는 케이스가 로드되지 않았다고 보고, 표준 시간 변경 비활성화
             if (TimezoneMenuItem != null)
                 TimezoneMenuItem.IsEnabled = false;
 
-            // 타임존 메뉴 초기 구성 (저장된 TimezoneTextBox 내용을 기준으로 선택 표시)
             BuildTimezoneMenu();
 
-            // saved 상태에서 케이스 경로가 있었다면 DB 다시 로드
             if (!string.IsNullOrEmpty(_savedCaseRoot) && Directory.Exists(_savedCaseRoot))
             {
                 _currentCaseRoot = _savedCaseRoot;
+
+                CurrentCaseRoot = _currentCaseRoot;
+                CurrentDbPath = Path.Combine(_currentCaseRoot, "DFMA-Case.dfmadb");
+                CurrentTimezoneDisplay = _savedTimezone;
+
                 _ = LoadCaseInfoFromCurrentRootAsync();
             }
         }
 
-        // Navigation 시 전달되는 파라미터 처리 (EvidenceProcess 등에서 케이스 절대 경로를 넘겨준 경우)
+        // 네비게이션 시 케이스 루트를 받아 초기화
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -76,10 +79,11 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                 _currentCaseRoot = caseRoot;
                 CaseFolderPathTextBox.Text = caseRoot;
 
-                // EvidenceProcess 에서 온 경우에는 "찾아보기..." 비활성화
+                CurrentCaseRoot = _currentCaseRoot;
+                CurrentDbPath = Path.Combine(_currentCaseRoot, "DFMA-Case.dfmadb");
+
                 BrowseCaseFolderButton.IsEnabled = false;
 
-                // 실제 로드가 끝나기 전까지는 표준 시간 변경 비활성화
                 if (TimezoneMenuItem != null)
                     TimezoneMenuItem.IsEnabled = false;
 
@@ -87,9 +91,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             }
         }
 
-        // ─────────────────────────────────────────────
-        //  상태 저장 / 불러오기
-        // ─────────────────────────────────────────────
+        // 현재 상태를 static 변수에 저장
         private void SaveState()
         {
             if (_isLoading) return;
@@ -98,8 +100,14 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             _savedCaseName = CaseNameTextBox.Text;
             _savedCaseCreateTime = CaseCreateTimeTextBox.Text;
             _savedTimezone = TimezoneTextBox.Text;
+
+            CurrentCaseRoot = _savedCaseRoot;
+            if (!string.IsNullOrEmpty(CurrentCaseRoot))
+                CurrentDbPath = Path.Combine(CurrentCaseRoot, "DFMA-Case.dfmadb");
+            CurrentTimezoneDisplay = _savedTimezone;
         }
 
+        // static 저장된 상태를 UI에 반영
         private void LoadSavedState()
         {
             CaseFolderPathTextBox.Text = _savedCaseRoot ?? string.Empty;
@@ -108,7 +116,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             TimezoneTextBox.Text = _savedTimezone ?? string.Empty;
         }
 
-        // UI 필드 초기화
+        // UI 입력값 초기화 및 static 상태 초기화
         private void ClearCaseInfoFields()
         {
             if (string.IsNullOrEmpty(_currentCaseRoot))
@@ -121,13 +129,17 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
             EvidenceSourceListView.ItemsSource = null;
 
-            // 케이스 정보가 없는 상태이므로 표준 시간 변경 비활성화
             if (TimezoneMenuItem != null)
                 TimezoneMenuItem.IsEnabled = false;
+
+            CurrentCaseRoot = null;
+            CurrentDbPath = null;
+            CurrentTimezoneDisplay = null;
 
             SaveState();
         }
 
+        // 간단한 메시지 다이얼로그 표시
         private async Task ShowMessageAsync(string title, string content)
         {
             var dialog = new ContentDialog
@@ -140,21 +152,17 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             await dialog.ShowAsync();
         }
 
-        // ─────────────────────────────────────────────
-        //  "찾아보기..." 버튼 (시작 페이지에서 들어온 경우 사용)
-        // ─────────────────────────────────────────────
+        // 케이스 DB 파일 선택 후 로드
         private async void BrowseCaseFolderButton_Click(object sender, RoutedEventArgs e)
         {
             var picker = new FileOpenPicker();
             var hwnd = WindowNative.GetWindowHandle(App.MainWindowInstance);
             InitializeWithWindow.Initialize(picker, hwnd);
 
-            // 케이스 DB 선택 (DFMA-Case.dfmadb 등)
             picker.FileTypeFilter.Add(".dfmadb");
 
             var file = await picker.PickSingleFileAsync();
-            if (file == null)
-                return;
+            if (file == null) return;
 
             var caseRoot = Path.GetDirectoryName(file.Path);
             if (string.IsNullOrEmpty(caseRoot))
@@ -166,16 +174,16 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             _currentCaseRoot = caseRoot;
             CaseFolderPathTextBox.Text = caseRoot;
 
-            // 새 케이스 로드 전까지는 표준 시간 변경 비활성화
+            CurrentCaseRoot = _currentCaseRoot;
+            CurrentDbPath = Path.Combine(_currentCaseRoot, "DFMA-Case.dfmadb");
+
             if (TimezoneMenuItem != null)
                 TimezoneMenuItem.IsEnabled = false;
 
             await LoadCaseInfoFromCurrentRootAsync();
         }
 
-        // ─────────────────────────────────────────────
-        //  케이스 정보 + Source Image 정보 로드
-        // ─────────────────────────────────────────────
+        // 케이스 정보 + 정적 이미지 소스 정보를 DB에서 읽어 UI에 반영
         private async Task LoadCaseInfoFromCurrentRootAsync()
         {
             if (string.IsNullOrEmpty(_currentCaseRoot))
@@ -194,15 +202,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
             try
             {
-                // sqlite3.dll 로드 (이미 로드되어 있으면 내부에서 무시)
-                try
-                {
-                    NativeDllManager.LoadNativeLibrary("sqlite3.dll", @"dll");
-                }
-                catch
-                {
-                    // 이미 로드된 경우 등은 무시
-                }
+                try { NativeDllManager.LoadNativeLibrary("sqlite3.dll", @"dll"); } catch { }
 
                 IntPtr db;
                 int flags = NativeSqliteHelper.SQLITE_OPEN_READWRITE;
@@ -218,7 +218,6 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
                 try
                 {
-                    // case_info 테이블 읽기
                     var info = SelectAllCaseInfo(db);
 
                     info.TryGetValue("CaseName", out var caseName);
@@ -228,26 +227,24 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                     CaseNameTextBox.Text = caseName ?? string.Empty;
                     TimezoneTextBox.Text = timezone ?? string.Empty;
 
-                    // DB의 원본 CaseCreateTime 문자열은 Tag에 보관하고,
-                    // TextBox에는 Timezone을 고려한 표시용 시간만 넣는다.
                     CaseCreateTimeTextBox.Tag = caseCreateTimeRaw ?? string.Empty;
                     CaseCreateTimeTextBox.Text = AdjustCaseCreateTimeForTimezone(
                         caseCreateTimeRaw,
                         timezone
                     );
 
-                    // evidence_source 테이블 읽기 (StaticImage 타입만)
                     var evidenceList = SelectEvidenceSourceStaticImage(db);
                     EvidenceSourceListView.ItemsSource = evidenceList;
 
-                    // 타임존 메뉴 다시 구성 (현 TimezoneTextBox 내용 기준으로 체크 상태 동기화)
                     BuildTimezoneMenu();
 
-                    // 케이스가 정상적으로 로드되었으므로 표준 시간 변경 가능
                     if (TimezoneMenuItem != null)
                         TimezoneMenuItem.IsEnabled = true;
 
-                    // 현재 UI 상태를 static에 저장
+                    CurrentCaseRoot = _currentCaseRoot;
+                    CurrentDbPath = dbPath;
+                    CurrentTimezoneDisplay = timezone;
+
                     SaveState();
                 }
                 finally
@@ -264,19 +261,14 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             }
         }
 
-        // ─────────────────────────────────────────────
-        //  타임존 선택 메뉴 (MenuBarItem + RadioMenuFlyoutItem)
-        // ─────────────────────────────────────────────
+        // 타임존 설정 메뉴 구성
         private void BuildTimezoneMenu()
         {
-            if (TimezoneMenuItem == null)
-                return;
+            if (TimezoneMenuItem == null) return;
 
             string currentDisplay = TimezoneTextBox.Text;
-
             TimezoneMenuItem.Items.Clear();
 
-            // 모든 시스템 타임존을 표시 (예: (UTC+09:00) Seoul ...)
             foreach (var tz in TimeZoneInfo.GetSystemTimeZones())
             {
                 var item = new RadioMenuFlyoutItem
@@ -287,17 +279,17 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                     IsChecked = !string.IsNullOrEmpty(currentDisplay) &&
                                 string.Equals(currentDisplay, tz.DisplayName, StringComparison.OrdinalIgnoreCase)
                 };
+
                 item.Click += TimezoneMenuItem_Click;
                 TimezoneMenuItem.Items.Add(item);
             }
         }
 
+        // 선택된 타임존을 DB 및 UI에 반영
         private async void TimezoneMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not RadioMenuFlyoutItem item)
-                return;
+            if (sender is not RadioMenuFlyoutItem item) return;
 
-            // 혹시라도 케이스가 없는 상태에서 클릭되는 것을 방지 (안전장치)
             if (string.IsNullOrEmpty(_currentCaseRoot))
             {
                 if (TimezoneMenuItem != null)
@@ -310,16 +302,16 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             string display = item.Text ?? string.Empty;
             TimezoneTextBox.Text = display;
 
-            // DB에 저장된 원본 CaseCreateTime (Tag에 보관된 값)을 기준으로
-            // 새 타임존을 적용한 표시용 시간을 재계산
             string rawCreateTime = (CaseCreateTimeTextBox.Tag as string) ?? CaseCreateTimeTextBox.Text;
             CaseCreateTimeTextBox.Text = AdjustCaseCreateTimeForTimezone(rawCreateTime, display);
 
-            SaveState();
+            CurrentTimezoneDisplay = display;
 
+            SaveState();
             await UpdateTimezoneInDbAsync(display);
         }
 
+        // DB의 타임존 값을 업데이트
         private async Task UpdateTimezoneInDbAsync(string timezoneDisplay)
         {
             if (string.IsNullOrEmpty(_currentCaseRoot))
@@ -337,14 +329,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
             try
             {
-                try
-                {
-                    NativeDllManager.LoadNativeLibrary("sqlite3.dll", @"dll");
-                }
-                catch
-                {
-                    // 이미 로드된 경우 등은 무시
-                }
+                try { NativeDllManager.LoadNativeLibrary("sqlite3.dll", @"dll"); } catch { }
 
                 IntPtr db;
                 int flags = NativeSqliteHelper.SQLITE_OPEN_READWRITE;
@@ -360,12 +345,13 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                 try
                 {
                     string safeTz = (timezoneDisplay ?? string.Empty).Replace("'", "''");
-
                     string sql =
                         "INSERT OR REPLACE INTO case_info(key, value) " +
                         $"VALUES('Timezone', '{safeTz}');";
 
                     NativeSqliteHelper.ExecNonQuery(db, sql);
+
+                    CurrentTimezoneDisplay = timezoneDisplay;
                 }
                 finally
                 {
@@ -380,25 +366,21 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             }
         }
 
-        // ─────────────────────────────────────────────
-        //  Timezone 기반 CaseCreateTime 표시용 변환
-        // ─────────────────────────────────────────────
+        // 타임존 기준으로 케이스 생성 시각 표시 변환
         private string AdjustCaseCreateTimeForTimezone(string? caseCreateTimeRaw, string? timezoneDisplay)
         {
             if (string.IsNullOrWhiteSpace(caseCreateTimeRaw) || string.IsNullOrWhiteSpace(timezoneDisplay))
                 return caseCreateTimeRaw ?? string.Empty;
 
-            // DB에 저장된 CaseCreateTime은 "기준 시간(예: UTC)"이라고 가정
-            // 파싱 시 우선 UTC로 가정
             if (!DateTime.TryParse(
                     caseCreateTimeRaw,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
                     out var utcBase))
             {
-                // 실패하면 로컬 기준으로라도 파싱 시도
                 if (!DateTime.TryParse(caseCreateTimeRaw, out utcBase))
                     return caseCreateTimeRaw;
+
                 utcBase = utcBase.ToUniversalTime();
             }
 
@@ -409,39 +391,31 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             return localTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
         }
 
-        /// <summary>
-        /// "(UTC+09:00) Seoul" 또는 "UTC+09:00" 같은 문자열에서 UTC offset 파싱
-        /// </summary>
+        // "UTC(+09:00)" 등에서 시차(TimeSpan)를 파싱
         private bool TryParseUtcOffsetFromDisplay(string? timezoneDisplay, out TimeSpan offset)
         {
             offset = TimeSpan.Zero;
-            if (string.IsNullOrWhiteSpace(timezoneDisplay))
-                return false;
+            if (string.IsNullOrWhiteSpace(timezoneDisplay)) return false;
 
             string candidate = timezoneDisplay.Trim();
 
-            // "(UTC+09:00) Seoul" 형식에서 괄호 안 부분만 추출
             int openIdx = candidate.IndexOf("(UTC", StringComparison.OrdinalIgnoreCase);
             if (openIdx >= 0)
             {
                 int closeIdx = candidate.IndexOf(')', openIdx);
                 if (closeIdx > openIdx)
                 {
-                    candidate = candidate.Substring(openIdx + 1, closeIdx - openIdx - 1); // "UTC+09:00"
+                    candidate = candidate.Substring(openIdx + 1, closeIdx - openIdx - 1);
                 }
             }
 
-            // 그냥 "UTC+09:00" 으로 들어온 경우도 처리
             if (!candidate.StartsWith("UTC", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            candidate = candidate.Substring(3).Trim(); // "+09:00" 또는 "-03:30" 등
+            candidate = candidate.Substring(3).Trim();
 
             int sign = 1;
-            if (candidate.StartsWith("+"))
-            {
-                candidate = candidate.Substring(1);
-            }
+            if (candidate.StartsWith("+")) candidate = candidate.Substring(1);
             else if (candidate.StartsWith("-"))
             {
                 sign = -1;
@@ -449,39 +423,17 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             }
 
             var parts = candidate.Split(':');
-            if (parts.Length == 0 || parts.Length > 2)
-                return false;
-
-            if (!int.TryParse(parts[0], out int hours))
-                return false;
+            if (parts.Length == 0 || parts.Length > 2) return false;
+            if (!int.TryParse(parts[0], out int hours)) return false;
 
             int minutes = 0;
-            if (parts.Length == 2 && !int.TryParse(parts[1], out minutes))
-                return false;
+            if (parts.Length == 2 && !int.TryParse(parts[1], out minutes)) return false;
 
             offset = new TimeSpan(sign * hours, sign * minutes, 0);
             return true;
         }
 
-        // ─────────────────────────────────────────────
-        //  SQLite sqlite3_exec P/Invoke 및 콜백
-        // ─────────────────────────────────────────────
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate int ExecCallback(
-            IntPtr arg,
-            int columnCount,
-            IntPtr columnValues,
-            IntPtr columnNames);
-
-        [DllImport("sqlite3", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern int sqlite3_exec(
-            IntPtr db,
-            string sql,
-            ExecCallback callback,
-            IntPtr arg,
-            out IntPtr errMsg);
-
-        // case_info 테이블: key, value (TEXT)
+        // case_info 테이블 전체 읽기
         private Dictionary<string, string> SelectAllCaseInfo(IntPtr db)
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -538,7 +490,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
             return result;
         }
 
-        // evidence_source 테이블: id, type, value
+        // evidence_source 테이블에서 정적 이미지 목록 읽기
         private List<EvidenceSourceItem> SelectEvidenceSourceStaticImage(IntPtr db)
         {
             var list = new List<EvidenceSourceItem>();
@@ -604,5 +556,21 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
             return list;
         }
+
+        // sqlite3_exec 델리게이트 및 extern 선언
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int ExecCallback(
+            IntPtr arg,
+            int columnCount,
+            IntPtr columnValues,
+            IntPtr columnNames);
+
+        [DllImport("sqlite3", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private static extern int sqlite3_exec(
+            IntPtr db,
+            string sql,
+            ExecCallback callback,
+            IntPtr arg,
+            out IntPtr errMsg);
     }
 }

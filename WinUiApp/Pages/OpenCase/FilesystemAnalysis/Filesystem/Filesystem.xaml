@@ -1,0 +1,306 @@
+<!-- 페이지: 파일 시스템 분석 UI 전체 구조 -->
+<Page
+    x:Class="WinUiApp.Pages.OpenCase.FilesystemAnalysis.Filesystem.Filesystem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinUiApp.Pages.OpenCase.FilesystemAnalysis.Filesystem"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:primitives="using:Microsoft.UI.Xaml.Controls.Primitives"
+    xmlns:tv="using:WinUI.TableView"
+    mc:Ignorable="d">
+
+    <!-- 메인 레이아웃 컨테이너 -->
+    <Grid x:Name="RootLayout">
+
+        <Grid.Resources>
+
+            <!-- 포커스 테두리 제거용 리소스 -->
+            <SolidColorBrush x:Key="ListViewItemFocusVisualPrimaryBrush" Color="Transparent"/>
+            <SolidColorBrush x:Key="ListViewItemFocusVisualSecondaryBrush" Color="Transparent"/>
+            <Thickness x:Key="ListViewItemFocusVisualPrimaryThickness">0</Thickness>
+            <Thickness x:Key="ListViewItemFocusVisualSecondaryThickness">0</Thickness>
+
+            <!-- TableView 셀 포커스 제거 -->
+            <SolidColorBrush x:Key="TableViewCellFocusVisualPrimaryBrush" Color="Transparent"/>
+            <SolidColorBrush x:Key="TableViewCellFocusVisualSecondaryBrush" Color="Transparent"/>
+
+            <!-- TreeView 아이템 스타일 -->
+            <Style TargetType="TreeViewItem">
+                <Setter Property="Padding" Value="6,4"/>
+                <Setter Property="MinHeight" Value="32"/>
+            </Style>
+
+            <!-- TableView 행 스타일 -->
+            <Style TargetType="tv:TableViewRow">
+                <Setter Property="MinHeight" Value="36"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            </Style>
+
+            <!-- TableView 셀 스타일 -->
+            <Style TargetType="tv:TableViewCell">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Padding" Value="8,4"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="0"/>
+                <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+                <Setter Property="FocusVisualPrimaryBrush" Value="Transparent"/>
+                <Setter Property="FocusVisualSecondaryBrush" Value="Transparent"/>
+            </Style>
+
+            <!-- TableView 헤더 스타일 -->
+            <Style TargetType="tv:TableViewColumnHeader">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Background" Value="Transparent"/>
+            </Style>
+
+            <!-- 공통 아이콘 스타일 -->
+            <Style x:Key="ExplorerGlyphStyle" TargetType="FontIcon">
+                <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+            </Style>
+
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 페이지 타이틀 -->
+        <TextBlock Grid.Row="0"
+                   Text="파일 시스템"
+                   FontSize="32"
+                   FontWeight="SemiBold"
+                   Margin="40,40,0,0"/>
+
+        <!-- 메인 콘텐츠 카드 컨테이너 -->
+        <Border Grid.Row="2"
+                Margin="40,0,40,40"
+                Padding="24"
+                CornerRadius="12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+
+            <!-- 좌측 트리뷰 + 스플리터 + 우측 TableView 레이아웃 -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="LeftPaneColumn" Width="380"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 좌측: 디렉터리 TreeView -->
+                <Border Grid.Column="0"
+                        CornerRadius="10"
+                        Padding="12"
+                        Margin="0,0,8,0"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 폴더 트리뷰 -->
+                        <TreeView x:Name="FileTreeView"
+                                  Grid.Row="2"
+                                  Expanding="FileTreeView_Expanding"
+                                  Collapsed="FileTreeView_Collapsed"
+                                  ItemInvoked="FileTreeView_ItemInvoked"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.IsVerticalRailEnabled="True">
+                            <TreeView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Style="{StaticResource ExplorerGlyphStyle}"
+                                                  Glyph="{Binding Content.IconGlyph}"/>
+                                        <TextBlock Text="{Binding Content.Name}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Grid>
+                </Border>
+
+                <!-- 좌/우 분할 스플리터 -->
+                <Border Grid.Column="1"
+                        Background="{ThemeResource CardStrokeColorDefaultBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+                    <primitives:Thumb x:Name="PaneSplitterThumb"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      DragDelta="PaneSplitterThumb_DragDelta"/>
+                </Border>
+
+                <!-- 우측: 디렉터리 정보 TableView -->
+                <Border Grid.Column="2"
+                        CornerRadius="10"
+                        Padding="12"
+                        Margin="8,0,0,0"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 테이블 상단 헤더 텍스트 -->
+                        <TextBlock x:Name="RightHeaderTextBlock"
+                                   Text="폴더를 선택하세요"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+
+                        <!-- 파일/폴더 상세 목록 TableView -->
+                        <tv:TableView x:Name="DirectoryTableView"
+                                      Grid.Row="2"
+                                      IsItemClickEnabled="True"
+                                      ItemClick="DirectoryListView_ItemClick"
+                                      DoubleTapped="DirectoryListView_DoubleTapped"
+                                      RightTapped="DirectoryListView_RightTapped"
+                                      AutoGenerateColumns="False"
+                                      SelectionMode="Single"
+                                      SelectionUnit="Row"
+                                      CornerButtonMode="None"
+                                      GridLinesVisibility="None"
+                                      IsReadOnly="True"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.IsVerticalRailEnabled="True">
+
+                            <!-- 우클릭 메뉴 -->
+                            <tv:TableView.ContextFlyout>
+                                <MenuFlyout x:Name="EntryContextFlyout">
+                                    <MenuFlyoutItem x:Name="ExtractMenuItem"
+                                                    Text="Extract"
+                                                    Click="ExtractMenuItem_Click"/>
+                                </MenuFlyout>
+                            </tv:TableView.ContextFlyout>
+
+                            <!-- TableView 컬럼 정의 -->
+                            <tv:TableView.Columns>
+
+                                <!-- 아이콘 컬럼 -->
+                                <tv:TableViewTemplateColumn Header=""
+                                                            Width="36"
+                                                            MinWidth="36"
+                                                            CanResize="False"
+                                                            CanSort="False"
+                                                            CanFilter="False"
+                                                            IsReadOnly="True">
+                                    <tv:TableViewTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <FontIcon Style="{StaticResource ExplorerGlyphStyle}"
+                                                      Glyph="{Binding Item.IconGlyph}"/>
+                                        </DataTemplate>
+                                    </tv:TableViewTemplateColumn.CellTemplate>
+                                </tv:TableViewTemplateColumn>
+
+                                <!-- 파일 이름 -->
+                                <tv:TableViewTextColumn Header="Name"
+                                                        Binding="{Binding Name}"
+                                                        MinWidth="180"
+                                                        Width="320"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- 파일 타입 -->
+                                <tv:TableViewTextColumn Header="Type"
+                                                        Binding="{Binding TypeText}"
+                                                        MinWidth="80"
+                                                        Width="110"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- 크기 -->
+                                <tv:TableViewTextColumn Header="Size"
+                                                        Binding="{Binding SizeText}"
+                                                        MinWidth="90"
+                                                        Width="120"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- 생성일 -->
+                                <tv:TableViewTextColumn Header="Created (C)"
+                                                        Binding="{Binding CreateText}"
+                                                        MinWidth="140"
+                                                        Width="170"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- 수정일 -->
+                                <tv:TableViewTextColumn Header="Modified (M)"
+                                                        Binding="{Binding ModifyText}"
+                                                        MinWidth="140"
+                                                        Width="170"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- 접근일 -->
+                                <tv:TableViewTextColumn Header="Accessed (A)"
+                                                        Binding="{Binding AccessText}"
+                                                        MinWidth="140"
+                                                        Width="170"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- MFT 수정일 -->
+                                <tv:TableViewTextColumn Header="MFT Modified (MC)"
+                                                        Binding="{Binding MftModifyText}"
+                                                        MinWidth="160"
+                                                        Width="190"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                                <!-- MFT 엔트리 -->
+                                <tv:TableViewTextColumn Header="MFT Entry"
+                                                        Binding="{Binding MftEntryText}"
+                                                        MinWidth="90"
+                                                        Width="120"
+                                                        CanResize="True"
+                                                        CanSort="True"
+                                                        CanFilter="True"
+                                                        IsReadOnly="True"/>
+
+                            </tv:TableView.Columns>
+                        </tv:TableView>
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

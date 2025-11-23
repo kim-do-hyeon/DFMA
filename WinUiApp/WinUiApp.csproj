@@ -71,15 +71,18 @@
     <None Remove="Assets\Icons\SmallTile.scale-200.png" />
     <None Remove="Assets\Icons\SmallTile.scale-400.png" />
     <None Remove="Assets\Icons\Wide310x150Logo.scale-400.png" />
-    <None Remove="Pages\EvidenceAnalysis\ArtifactsAnalysis\EventlogAnalysis.xaml" />
-    <None Remove="Pages\EvidenceAnalysis\CaseImformation.xaml" />
-    <None Remove="Pages\EvidenceAnalysis\FilesystemAnalysis\FilesystemAnalysis.xaml" />
-    <None Remove="Pages\PreparingEvidence\EvidenceProcess\EvidenceProcess.xaml" />
-    <None Remove="Pages\PreparingEvidence\EvidenceSource\DynamicDisk.xaml" />
-    <None Remove="Pages\PreparingEvidence\EvidenceSource\RemoteDisk.xaml" />
-    <None Remove="Pages\PreparingEvidence\EvidenceSource\StaticImage.xaml" />
+    <None Remove="Interop\EwfInteropxaml.xaml" />
+    <None Remove="Pages\OpenCase\CaseImformation.xaml" />
+    <None Remove="Pages\CreateCase\EvidenceProcess\EvidenceProcess.xaml" />
+    <None Remove="Pages\CreateCase\EvidenceSource\DynamicDisk.xaml" />
+    <None Remove="Pages\CreateCase\EvidenceSource\RemoteDisk.xaml" />
+    <None Remove="Pages\CreateCase\EvidenceSource\StaticImage.xaml" />
+    <None Remove="Pages\OpenCase\FilesystemAnalysis\Filesystem\Filesystem.xaml" />
     <None Remove="Pages\Settings\Settings.xaml" />
     <None Remove="Pages\StartPage.xaml" />
+    <None Remove="Services\Extract.xaml" />
+    <None Remove="Services\FileSystemTreeService.xaml" />
+    <None Remove="Services\NtfsMetadataPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -102,11 +105,13 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DiscUtils" Version="0.16.13" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
+    <PackageReference Include="WinUI.TableView" Version="1.3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\PreparingEvidence.xaml">
+    <Page Update="Pages\OpenCase.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -116,7 +121,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\EvidenceAnalysis.xaml">
+    <Page Update="Pages\CreateCase.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -140,6 +145,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\CaseAnalysis\**" />
+    <EmbeddedResource Remove="Pages\CaseAnalysis\**" />
+    <None Remove="Pages\CaseAnalysis\**" />
+    <Page Remove="Pages\CaseAnalysis\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="Interop\NativeSqliteHelper.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -159,44 +171,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\PreparingEvidence\EvidenceCase\" />
-    <Folder Include="Pages\EvidenceAnalysis\EvidenceCase\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\EvidenceAnalysis\FilesystemAnalysis\FilesystemAnalysis.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\EvidenceAnalysis\ArtifactsAnalysis\EventlogAnalysis.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\CaseAnalysis\EvidenceProcess\EvidenceProcess.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\CaseAnalysis\EvidenceSource\RemoteDisk.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\CaseAnalysis\EvidenceSource\DynamicDisk.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Pages\CaseAnalysis\EvidenceSource\StaticImage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Folder Include="Pages\OpenCase\EvidenceCase\" />
+    <Folder Include="Pages\CreateCase\EvidenceCase\" />
   </ItemGroup>
   
   <!--
@@ -215,4 +191,32 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
+  <ItemGroup>
+    <PRIResource Remove="Pages\CaseAnalysis\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Interop\EwfInteropxaml.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Services\NtfsMetadataPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Services\FileSystemTreeService.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Services\Extract.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\OpenCase\FilesystemAnalysis\Filesystem\Filesystem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

@@ -1,9 +1,10 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Linq;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using System.Linq;
+
 using WinUiApp.Pages.ArtifactsAnalysis;
-using WinUiApp.Pages.EvidenceAnalysis.FilesystemAnalysis;
+using WinUiApp.Pages.OpenCase.FilesystemAnalysis.Filesystem;
 
 namespace WinUiApp.Pages
 {
@@ -71,9 +72,9 @@ namespace WinUiApp.Pages
                     contentFrame.Navigate(typeof(CaseImformation), _caseRootFromParameter);
                     break;
 
-                case "FilesystemAnalysis":
-                    // 파일 시스템 분석 탭 선택 시 파일 시스템 페이지로 이동
-                    contentFrame.Navigate(typeof(FilesystemAnalysis), _caseRootFromParameter);
+                case "FileSystemAnalysis":
+                    // 현재 케이스 경로 파라미터를 항상 함께 넘긴다.
+                    contentFrame.Navigate(typeof(Filesystem), _caseRootFromParameter);
                     break;
 
                 default:
