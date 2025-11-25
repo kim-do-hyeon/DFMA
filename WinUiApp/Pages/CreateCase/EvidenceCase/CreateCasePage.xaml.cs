@@ -1,14 +1,18 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
+
 using Windows.ApplicationModel;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
+
 using WinUiApp.Interop;
+using WinUiApp.Services;
+using WinUiApp.Pages.ArtifactsAnalysis;
 
 namespace WinUiApp.Pages.CaseAnalysis
 {
@@ -113,6 +117,17 @@ namespace WinUiApp.Pages.CaseAnalysis
                 string.IsNullOrEmpty(folderName) ||
                 string.IsNullOrEmpty(folderPath))
             {
+                // 로그: 입력 누락
+                AnalysisLogHelper.Warn(
+                    category: "CaseCreate",
+                    message: "케이스 생성 실패 - 필수 항목 누락",
+                    data: new
+                    {
+                        case_name = caseName,
+                        folder_name = folderName,
+                        folder_path = folderPath
+                    });
+
                 var dialog = new ContentDialog
                 {
                     XamlRoot = this.XamlRoot,
@@ -125,12 +140,22 @@ namespace WinUiApp.Pages.CaseAnalysis
             }
 
             string caseRoot = Path.Combine(folderPath, folderName);
-
-            // 이미 케이스 존재하면 재생성 불가
             string dbPath = Path.Combine(caseRoot, "DFMA-Case.dfmadb");
 
+            // 이미 케이스 존재하면 재생성 불가
             if (File.Exists(dbPath))
             {
+                // 로그: 이미 존재하는 케이스
+                AnalysisLogHelper.Warn(
+                    category: "CaseCreate",
+                    message: "케이스 생성 스킵 - 이미 존재",
+                    data: new
+                    {
+                        case_name = caseName,
+                        case_root = caseRoot,
+                        db_path = dbPath
+                    });
+
                 var dialog = new ContentDialog
                 {
                     XamlRoot = this.XamlRoot,
@@ -151,9 +176,37 @@ namespace WinUiApp.Pages.CaseAnalysis
 
                 // 4) DB 생성 및 초기화 (테이블 + case_info row 삽입)
                 CreateAndInitDatabase(dbPath, caseName!);
+
+                // 로그: 케이스 생성 성공
+                AnalysisLogHelper.Write(
+                    caseRoot,
+                    level: "INFO",
+                    category: "CaseCreate",
+                    message: "케이스 생성 성공",
+                    data: new
+                    {
+                        case_name = caseName,
+                        case_root = caseRoot,
+                        db_path = dbPath
+                    });
             }
             catch (NativeDllManager.NativeDllLoadException ex)
             {
+                // 로그: sqlite3.dll 로드 실패
+                AnalysisLogHelper.Write(
+                    caseRoot,
+                    level: "ERROR",
+                    category: "CaseCreate",
+                    message: "케이스 생성 실패 - sqlite3.dll 로드 오류",
+                    data: new
+                    {
+                        case_name = caseName,
+                        case_root = caseRoot,
+                        db_path = dbPath,
+                        exception_type = ex.GetType().FullName,
+                        exception_message = ex.Message
+                    });
+
                 var dialog = new ContentDialog
                 {
                     XamlRoot = this.XamlRoot,
@@ -166,6 +219,21 @@ namespace WinUiApp.Pages.CaseAnalysis
             }
             catch (Exception ex)
             {
+                // 로그: 기타 예외로 생성 실패
+                AnalysisLogHelper.Write(
+                    caseRoot,
+                    level: "ERROR",
+                    category: "CaseCreate",
+                    message: "케이스 생성 실패 - 일반 예외",
+                    data: new
+                    {
+                        case_name = caseName,
+                        case_root = caseRoot,
+                        db_path = dbPath,
+                        exception_type = ex.GetType().FullName,
+                        exception_message = ex.Message
+                    });
+
                 var dialog = new ContentDialog
                 {
                     XamlRoot = this.XamlRoot,
@@ -180,9 +248,9 @@ namespace WinUiApp.Pages.CaseAnalysis
             // 값/DB 생성까지 모두 성공했으면 페이지 이동
             if (App.MainWindowInstance is MainWindow window2)
             {
-                // 좌측 NavigationView 는 그대로 두고
-                // 오른쪽 영역에 EvidenceSource 페이지 로드
-                window2.RootFrameControl.Navigate(typeof(WinUiApp.Pages.CaseAnalysisPage), "EvidenceSource");
+                window2.RootFrameControl.Navigate(
+                    typeof(WinUiApp.Pages.CaseAnalysisPage),
+                    "EvidenceSource");
             }
         }
 

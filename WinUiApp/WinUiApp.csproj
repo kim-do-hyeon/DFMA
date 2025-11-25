@@ -80,6 +80,7 @@
     <None Remove="Pages\OpenCase\FilesystemAnalysis\Filesystem\Filesystem.xaml" />
     <None Remove="Pages\Settings\Settings.xaml" />
     <None Remove="Pages\StartPage.xaml" />
+    <None Remove="Services\CaseFilesystemScanner.xaml" />
     <None Remove="Services\Extract.xaml" />
     <None Remove="Services\FileSystemTreeService.xaml" />
     <None Remove="Services\NtfsMetadataPage.xaml" />
@@ -193,6 +194,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="Pages\CaseAnalysis\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Services\AnalysisLogHelper.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Services\CaseFilesystemScanner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Interop\EwfInteropxaml.xaml">

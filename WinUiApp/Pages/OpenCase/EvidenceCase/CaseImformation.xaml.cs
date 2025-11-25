@@ -1,23 +1,28 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 using WinUiApp.Interop;
+using WinUiApp.Services;
 
 namespace WinUiApp.Pages.ArtifactsAnalysis
 {
     // 페이지에서 케이스 정보 및 타임존을 관리하는 UI Page
     public sealed partial class CaseImformation : Page
     {
+        
+
         public static string? CurrentCaseRoot { get; private set; }
         public static string? CurrentDbPath { get; private set; }
         public static string? CurrentTimezoneDisplay { get; private set; }
