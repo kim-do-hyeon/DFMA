@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.36617.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinUiApp", "WinUiApp\WinUiApp.csproj", "{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFMA", "DFMA\DFMA.csproj", "{03CB1834-7D9C-4592-9E9D-1C8957D0ABEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
