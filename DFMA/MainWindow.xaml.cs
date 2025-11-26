@@ -19,7 +19,7 @@ namespace WinUiApp
 
             var v = Package.Current.Id.Version;  // 버전 정보 가져오기
             string versionString = $"{v.Major}.{v.Minor}.{v.Build}.{v.Revision}";
-            this.AppWindow.Title = $"DF_m@ster v{versionString}";
+            this.AppWindow.Title = $"DFMA v{versionString}";
 
             SetWindowIcon();  // 아이콘 설정
 
