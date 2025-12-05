@@ -161,6 +161,31 @@ namespace WinUiApp.Interop
             IntPtr columnValues,
             IntPtr columnNames);
 
+        // UTF-8 바이트 배열을 문자열로 변환하는 헬퍼 메서드
+        // NativeSqliteHelper는 UTF-8로 인코딩하므로 ANSI가 아닌 UTF-8로 디코딩해야 함
+        public static string? PtrToStringUtf8(IntPtr ptr)
+        {
+            if (ptr == IntPtr.Zero)
+                return null;
+
+            // null-terminated UTF-8 문자열 읽기
+            var bytes = new List<byte>();
+            int offset = 0;
+            while (true)
+            {
+                byte b = Marshal.ReadByte(ptr, offset);
+                if (b == 0)
+                    break;
+                bytes.Add(b);
+                offset++;
+            }
+
+            if (bytes.Count == 0)
+                return null;
+
+            return Encoding.UTF8.GetString(bytes.ToArray());
+        }
+
         // 콜백을 사용하는 sqlite3_exec 오버로드
         // 내부적으로 Microsoft.Data.Sqlite를 사용하여 구현
         public static int sqlite3_exec(

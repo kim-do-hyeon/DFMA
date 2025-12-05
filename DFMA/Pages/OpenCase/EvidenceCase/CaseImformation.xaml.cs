@@ -454,10 +454,10 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
                 for (int i = 0; i < columnCount; i++)
                 {
-                    string colName = Marshal.PtrToStringAnsi(namePtrs[i]) ?? string.Empty;
+                    string colName = NativeSqliteHelper.PtrToStringUtf8(namePtrs[i]) ?? string.Empty;
                     string colVal = valuePtrs[i] == IntPtr.Zero
                         ? string.Empty
-                        : (Marshal.PtrToStringAnsi(valuePtrs[i]) ?? string.Empty);
+                        : (NativeSqliteHelper.PtrToStringUtf8(valuePtrs[i]) ?? string.Empty);
 
                     if (colName.Equals("key", StringComparison.OrdinalIgnoreCase))
                         key = colVal;
@@ -484,7 +484,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                 string message = $"SQLite SELECT 오류 (case_info, rc={rc})";
                 if (errPtr != IntPtr.Zero)
                 {
-                    message += ": " + Marshal.PtrToStringAnsi(errPtr);
+                    message += ": " + (NativeSqliteHelper.PtrToStringUtf8(errPtr) ?? "");
                     NativeSqliteHelper.sqlite3_free(errPtr);
                 }
                 throw new InvalidOperationException(message);
@@ -512,10 +512,10 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
 
                 for (int i = 0; i < columnCount; i++)
                 {
-                    string colName = Marshal.PtrToStringAnsi(namePtrs[i]) ?? string.Empty;
+                    string colName = NativeSqliteHelper.PtrToStringUtf8(namePtrs[i]) ?? string.Empty;
                     string colVal = valuePtrs[i] == IntPtr.Zero
                         ? string.Empty
-                        : (Marshal.PtrToStringAnsi(valuePtrs[i]) ?? string.Empty);
+                        : (NativeSqliteHelper.PtrToStringUtf8(valuePtrs[i]) ?? string.Empty);
 
                     if (colName.Equals("id", StringComparison.OrdinalIgnoreCase))
                         long.TryParse(colVal, out id);
@@ -551,7 +551,7 @@ namespace WinUiApp.Pages.ArtifactsAnalysis
                 string message = $"SQLite SELECT 오류 (evidence_source, rc={rc})";
                 if (errPtr != IntPtr.Zero)
                 {
-                    message += ": " + Marshal.PtrToStringAnsi(errPtr);
+                    message += ": " + (NativeSqliteHelper.PtrToStringUtf8(errPtr) ?? "");
                     NativeSqliteHelper.sqlite3_free(errPtr);
                 }
                 throw new InvalidOperationException(message);

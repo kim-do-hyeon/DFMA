@@ -712,12 +712,12 @@ namespace WinUiApp.Pages.OpenCase.FilesystemAnalysis.Filesystem
 
                 for (int i = 0; i < columnCount; i++)
                 {
-                    string colName = Marshal.PtrToStringAnsi(namePtrs[i]) ?? "";
+                    string colName = NativeSqliteHelper.PtrToStringUtf8(namePtrs[i]) ?? "";
                     if (!colName.Equals("value", StringComparison.OrdinalIgnoreCase)) continue;
 
                     string colVal = valuePtrs[i] == IntPtr.Zero
                         ? ""
-                        : (Marshal.PtrToStringAnsi(valuePtrs[i]) ?? "");
+                        : (NativeSqliteHelper.PtrToStringUtf8(valuePtrs[i]) ?? "");
 
                     if (!string.IsNullOrWhiteSpace(colVal))
                         list.Add(colVal);
