@@ -104,7 +104,7 @@ namespace WinUiApp.Pages.CaseAnalysis
         // "케이스 생성" 버튼 클릭
         // 1) 값 검증
         // 2) 케이스 폴더 + DB 파일 생성
-        // 3) sqlite3.dll 로 로컬 DB 초기화
+        // 3) Microsoft.Data.Sqlite로 로컬 DB 초기화
         // 4) 성공 시 CaseAnalysisPage 로 이동
         private async void CreateCase_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -171,10 +171,8 @@ namespace WinUiApp.Pages.CaseAnalysis
             {
                 Directory.CreateDirectory(caseRoot);
 
-                // 3) sqlite3.dll 로딩 (dll\sqlite3.dll)
-                NativeDllManager.LoadNativeLibrary("sqlite3.dll", @"dll");
-
-                // 4) DB 생성 및 초기화 (테이블 + case_info row 삽입)
+                // 3) DB 생성 및 초기화 (테이블 + case_info row 삽입)
+                // Microsoft.Data.Sqlite가 자동으로 네이티브 DLL을 관리합니다.
                 CreateAndInitDatabase(dbPath, caseName!);
 
                 // 로그: 케이스 생성 성공
@@ -190,41 +188,14 @@ namespace WinUiApp.Pages.CaseAnalysis
                         db_path = dbPath
                     });
             }
-            catch (NativeDllManager.NativeDllLoadException ex)
-            {
-                // 로그: sqlite3.dll 로드 실패
-                AnalysisLogHelper.Write(
-                    caseRoot,
-                    level: "ERROR",
-                    category: "CaseCreate",
-                    message: "케이스 생성 실패 - sqlite3.dll 로드 오류",
-                    data: new
-                    {
-                        case_name = caseName,
-                        case_root = caseRoot,
-                        db_path = dbPath,
-                        exception_type = ex.GetType().FullName,
-                        exception_message = ex.Message
-                    });
-
-                var dialog = new ContentDialog
-                {
-                    XamlRoot = this.XamlRoot,
-                    Title = "sqlite3.dll 로드 실패",
-                    Content = ex.Message,
-                    CloseButtonText = "확인"
-                };
-                await dialog.ShowAsync();
-                return;
-            }
             catch (Exception ex)
             {
-                // 로그: 기타 예외로 생성 실패
+                // 로그: 케이스 생성 실패
                 AnalysisLogHelper.Write(
                     caseRoot,
                     level: "ERROR",
                     category: "CaseCreate",
-                    message: "케이스 생성 실패 - 일반 예외",
+                    message: "케이스 생성 실패",
                     data: new
                     {
                         case_name = caseName,
@@ -238,7 +209,7 @@ namespace WinUiApp.Pages.CaseAnalysis
                 {
                     XamlRoot = this.XamlRoot,
                     Title = "케이스 생성 실패",
-                    Content = ex.Message,
+                    Content = $"케이스를 생성하는 중 오류가 발생했습니다.\n\n{ex.Message}",
                     CloseButtonText = "확인"
                 };
                 await dialog.ShowAsync();
