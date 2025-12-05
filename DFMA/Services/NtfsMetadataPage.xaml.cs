@@ -15,10 +15,10 @@ using WinUiApp;
 
 namespace WinUiApp.Services
 {
-    // NTFS ÆÄÀÏ/Æú´õ ¸ŞÅ¸µ¥ÀÌÅÍ¸¦ ¼öÁı¡¤°¡°øÇÏ´Â ¼­ºñ½º
+    // NTFS ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
     public sealed class NtfsMetadataService
     {
-        // NTFS ¸ŞÅ¸µ¥ÀÌÅÍÀÇ Á¤Çü ±¸Á¶ ¸ğµ¨
+        // NTFS ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         public record MetadataInfo(
             string Name,
             string NtfsPath,
@@ -33,7 +33,7 @@ namespace WinUiApp.Services
             ulong RawFileRef
         );
 
-        // ExplorerItem ±â¹İÀ¸·Î NTFS ¸ŞÅ¸µ¥ÀÌÅÍ¸¦ ÆÄ½Ì
+        // ExplorerItem ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ NTFS ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ä½ï¿½
         public MetadataInfo Parse(NtfsFileSystem ntfs, ExplorerItem item)
         {
             var path = string.IsNullOrEmpty(item.FullPath) ? "\\" : item.FullPath;
@@ -62,14 +62,14 @@ namespace WinUiApp.Services
             );
         }
 
-        // MetadataInfo¸¦ »ç¶÷ÀÌ ÀĞ±â ½¬¿î ¹®ÀÚ¿­·Î Ãâ·Â
+        // MetadataInfoï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         public string FormatForDisplay(MetadataInfo info)
         {
             var sb = new StringBuilder()
-                .AppendLine($"ÀÌ¸§: {info.Name}")
-                .AppendLine($"NTFS °æ·Î: {info.NtfsPath}")
-                .AppendLine($"Å¸ÀÔ: {info.Type}")
-                .AppendLine($"Å©±â(Size): {info.SizeBytes:N0} bytes")
+                .AppendLine($"ï¿½Ì¸ï¿½: {info.Name}")
+                .AppendLine($"NTFS ï¿½ï¿½ï¿½: {info.NtfsPath}")
+                .AppendLine($"Å¸ï¿½ï¿½: {info.Type}")
+                .AppendLine($"Å©ï¿½ï¿½(Size): {info.SizeBytes:N0} bytes")
                 .AppendLine()
                 .AppendLine($"Create      : {info.CreateUtc:yyyy-MM-dd HH:mm:ss.ffff} (UTC)")
                 .AppendLine($"Modify(Data): {info.ModifyUtc:yyyy-MM-dd HH:mm:ss.ffff} (UTC)")
@@ -87,7 +87,7 @@ namespace WinUiApp.Services
             return sb.ToString();
         }
 
-        // ÆÄÀÏÀÇ MFT ÂüÁ¶(Entry ¹øÈ£ / Sequence)¸¦ ÃßÃâ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ MFT ï¿½ï¿½ï¿½ï¿½(Entry ï¿½ï¿½È£ / Sequence)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         static (ulong rawRef, ulong mftEntry, ushort seq) GetFileRef(NtfsFileSystem ntfs, string path)
         {
             try
@@ -101,7 +101,7 @@ namespace WinUiApp.Services
         }
     }
 
-    // NTFS ³»ºÎ ½Ã°£/ADS/¼Ó¼º µîÀ» Reflection ±â¹İÀ¸·Î ºĞ¼®ÇÏ´Â ÇïÆÛ
+    // NTFS ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½/ADS/ï¿½Ó¼ï¿½ ï¿½ï¿½ï¿½ï¿½ Reflection ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ¼ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
     internal static class NtfsMetadataHelper
     {
         record TimeProps(PropertyInfo? C, PropertyInfo? M, PropertyInfo? A, PropertyInfo? MC);
@@ -117,7 +117,7 @@ namespace WinUiApp.Services
         sealed class VolumeTimeHolder { public DateTime BaseUtc; public bool HasValue; }
         static readonly ConditionalWeakTable<NtfsFileSystem, VolumeTimeHolder> _volBaseTimes = new();
 
-        // NTFS ³»ºÎ ±¸Á¶¿¡ ´ëÇÑ Reflection ¸ŞÅ¸Á¤º¸ ÃÊ±âÈ­
+        // NTFS ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Reflection ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         static NtfsMetadataHelper()
         {
             try
@@ -165,14 +165,14 @@ namespace WinUiApp.Services
             catch { }
         }
 
-        // ¿©·¯ ÀÌ¸§ ÈÄº¸ Áß Á¸ÀçÇÏ´Â PropertyInfo ¹İÈ¯
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ PropertyInfo ï¿½ï¿½È¯
         static PropertyInfo? GetProp(Type t, params string[] names)
             => names.Select(t.GetProperty).FirstOrDefault(p => p != null);
 
-        // object ¡æ DateTime º¯È¯ À¯Æ¿¸®Æ¼
+        // object ï¿½ï¿½ DateTime ï¿½ï¿½È¯ ï¿½ï¿½Æ¿ï¿½ï¿½Æ¼
         static DateTime FromObj(object? v) => v is DateTime dt ? dt : DateTime.MinValue;
 
-        // NTFS Epoch ±âÁØÀ¸·Î "ÀÇ½É½º·¯¿î" ½Ã°£ ÆÇÁ¤
+        // NTFS Epoch ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ "ï¿½Ç½É½ï¿½ï¿½ï¿½ï¿½ï¿½" ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
         static bool IsSuspicious(DateTime dt)
         {
             if (dt == DateTime.MinValue) return true;
@@ -182,7 +182,7 @@ namespace WinUiApp.Services
             return utc <= NtfsEpochUtc.AddDays(1);
         }
 
-        // Àü´ŞµÈ ¸ŞÅ¸°´Ã¼¿¡¼­ ½Ã°£ ¼Ó¼ºµéÀ» ÃßÃâ
+        // ï¿½ï¿½ï¿½Şµï¿½ ï¿½ï¿½Å¸ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         static void ReadTimes(object? info, TimeProps p,
             ref DateTime c, ref DateTime m, ref DateTime a, ref DateTime mc)
         {
@@ -193,7 +193,7 @@ namespace WinUiApp.Services
             if (p.MC != null) mc = FromObj(p.MC.GetValue(info));
         }
 
-        // ADS °æ·Î ºĞ¸®(ÆÄÀÏ º»Ã¼ / ½ºÆ®¸²¸í)
+        // ADS ï¿½ï¿½ï¿½ ï¿½Ğ¸ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ / ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½)
         static (string plain, string? stream) SplitAdsPath(string path)
         {
             var idx = path.IndexOf(':');
@@ -201,11 +201,12 @@ namespace WinUiApp.Services
             return (path.Substring(0, idx), path[(idx + 1)..]);
         }
 
-        // NTFS ÆÄÀÏÀÇ Named Data Stream ¸ñ·ÏÀ» ÃßÃâ
+        // NTFS ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Named Data Stream ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         public static List<string> ListNamedDataStreams(NtfsFileSystem ntfs, string path)
         {
             var (plainPath, _) = SplitAdsPath(path);
             var result = new List<string>();
+            var includeNonData = IsRootMetafile(plainPath);
 
             void AddName(string? name)
             {
@@ -263,9 +264,10 @@ namespace WinUiApp.Services
                         name = nameObj?.ToString();
 
                     if (string.IsNullOrWhiteSpace(name)) continue;
-                    if (!IsDataAttribute(typeProp?.GetValue(attr))) continue;
 
-                    AddName(name);
+                    var isData = IsDataAttribute(typeProp?.GetValue(attr));
+                    if (isData || includeNonData)
+                        AddName(name);
                 }
             }
 
@@ -379,29 +381,409 @@ namespace WinUiApp.Services
                 .ToList();
         }
 
-        // ½ºÆ®¸² API ¡æ ÆÄÀÏ ±æÀÌ °¡Á®¿À±â (ADS Æ÷ÇÔ)
+        // ï¿½ï¿½Æ®ï¿½ï¿½ API ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ADS ï¿½ï¿½ï¿½ï¿½)
         public static long GetFileSizeSafe(NtfsFileSystem ntfs, string path)
         {
+            var (plainPath, adsName) = SplitAdsPath(path);
+            long result = 0;
+            string debugInfo = "";
+            long bestDataLength = 0;
+
+            void TrackCandidateValue(long candidate)
+            {
+                if (candidate > bestDataLength)
+                    bestDataLength = candidate;
+            }
+
+            void TrackCandidate(object? value)
+            {
+                if (value is long l && l >= 0) TrackCandidateValue(l);
+                else if (value is ulong u) TrackCandidateValue(unchecked((long)u));
+                else if (value is int i && i >= 0) TrackCandidateValue(i);
+            }
+
+            // DATA ì†ì„±ì¸ì§€ í™•ì¸í•˜ëŠ” ë¡œì»¬ í•¨ìˆ˜
+            bool IsDataAttribute(object? typeObj)
+            {
+                var typeStr = typeObj?.ToString() ?? "";
+                return typeStr.Equals("Data", StringComparison.OrdinalIgnoreCase) ||
+                       typeStr.EndsWith("Data", StringComparison.OrdinalIgnoreCase);
+            }
+
+            // 1. GetFileLength ë¦¬í”Œë ‰ì…˜ ì‹œë„ (0ë³´ë‹¤ í° ê°’ë§Œ ìœ íš¨)
             try
             {
                 var mi = ntfs.GetType().GetMethod("GetFileLength", new[] { typeof(string) });
-                if (mi != null && mi.Invoke(ntfs, new object[] { path }) is long len)
+                if (mi != null && mi.Invoke(ntfs, new object[] { path }) is long len && len > 0)
+                {
+                    result = len;
+                    debugInfo = $"GetFileLength: {len}";
+                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
                     return len;
+                }
+                else if (mi != null)
+                {
+                    var lenValue = mi.Invoke(ntfs, new object[] { path });
+                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: GetFileLength returned {lenValue}, continuing...");
+                }
+            }
+            catch (Exception ex)
+            {
+                debugInfo = $"GetFileLength failed: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: {debugInfo}");
+            }
+
+            // 2. StandardInformationì—ì„œ íŒŒì¼ í¬ê¸° ì½ê¸° (íŠ¹ìˆ˜ íŒŒì¼ë„ ì²˜ë¦¬ ê°€ëŠ¥)
+            try
+            {
+                if (GetFile != null && GetStdInfo != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Attempting to get File object...");
+                    var fileObj = GetFile.Invoke(ntfs, new object[] { plainPath });
+                    if (fileObj != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: File object obtained, getting StandardInformation...");
+                        var stdInfo = GetStdInfo.Invoke(fileObj, null);
+                        if (stdInfo != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: StandardInformation obtained");
+                            // StandardInformationì˜ ëª¨ë“  ì†ì„± í™•ì¸
+                            var stdInfoType = stdInfo.GetType();
+                            var allProps = stdInfoType.GetProperties(
+                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: StandardInfo has {allProps.Length} properties");
+
+                            // ê°€ëŠ¥í•œ íŒŒì¼ í¬ê¸° ì†ì„± ì´ë¦„ë“¤
+                            var sizePropNames = new[] { "AllocatedSize", "LogicalSize", "FileSize", 
+                                "Size", "Length", "EndOfFile", "ValidDataLength" };
+
+                            foreach (var propName in sizePropNames)
+                            {
+                                var prop = allProps.FirstOrDefault(p => 
+                                    p.Name.Equals(propName, StringComparison.OrdinalIgnoreCase));
+                                if (prop != null)
+                                {
+                                    var value = prop.GetValue(stdInfo);
+                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: StandardInfo.{propName} = {value} (type: {value?.GetType().Name})");
+                                    if (value is long size && size > 0)
+                                    {
+                                        result = size;
+                                        debugInfo = $"StandardInfo.{propName}: {size}";
+                                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                        return size;
+                                    }
+                                    if (value is ulong uSize && uSize > 0 && uSize <= long.MaxValue)
+                                    {
+                                        result = (long)uSize;
+                                        debugInfo = $"StandardInfo.{propName}: {(long)uSize}";
+                                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                        return (long)uSize;
+                                    }
+                                    if (value is int iSize && iSize > 0)
+                                    {
+                                        result = iSize;
+                                        debugInfo = $"StandardInfo.{propName}: {iSize}";
+                                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                        return iSize;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: StandardInformation is null");
+                        }
+
+                        // File ê°ì²´ì˜ Length ì†ì„± ì‹œë„
+                        var lengthProp = fileObj.GetType().GetProperty("Length",
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                        if (lengthProp != null)
+                        {
+                            var fileLenValue = lengthProp.GetValue(fileObj);
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: File.Length = {fileLenValue} (type: {fileLenValue?.GetType().Name})");
+                            if (fileLenValue is long fileLen && fileLen > 0)
+                            {
+                                result = fileLen;
+                                debugInfo = $"File.Length: {fileLen}";
+                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                return fileLen;
+                            }
+                        }
+
+                        // MFT Recordì—ì„œ Data ì†ì„±ì˜ ì‹¤ì œ í¬ê¸° ì½ê¸°
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Attempting to read MFT Record...");
+                        var mftRecProp = fileObj.GetType().GetProperty("MftRecord",
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                        var mftRec = mftRecProp?.GetValue(fileObj);
+                        if (mftRec != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: MFT Record obtained");
+                            var attrsProp = mftRec.GetType().GetProperty("Attributes",
+                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                            if (attrsProp?.GetValue(mftRec) is IEnumerable attrs)
+                            {
+                                int attrCount = 0;
+                                foreach (var attr in attrs)
+                                {
+                                    attrCount++;
+                                    if (attr == null) continue;
+
+                                    // ì†ì„± íƒ€ì… í™•ì¸
+                                    var typeProp = attr.GetType().GetProperty("Type")
+                                                ?? attr.GetType().GetProperty("AttributeType");
+                                    var attrType = typeProp?.GetValue(attr);
+                                    
+                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Attribute #{attrCount}, Type = {attrType}");
+                                    
+                                    // DATA ì†ì„±ì¸ì§€ í™•ì¸
+                                    if (!IsDataAttribute(attrType)) continue;
+                                    
+                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Found DATA attribute");
+
+                                    // ì†ì„± ì´ë¦„ í™•ì¸ (ADSì¸ ê²½ìš°)
+                                    var nameProp = attr.GetType().GetProperty("Name")
+                                                ?? attr.GetType().GetProperty("AttributeName")
+                                                ?? attr.GetType().GetProperty("StreamName");
+                                    var nameObj = nameProp?.GetValue(attr);
+                                    string? attrName = null;
+                                    if (nameObj is byte[] bytes)
+                                        attrName = Encoding.Unicode.GetString(bytes).TrimEnd('\0');
+                                    else
+                                        attrName = nameObj?.ToString();
+                                    
+                                    if (string.IsNullOrEmpty(adsName))
+                                    {
+                                        // ê¸°ë³¸ ë°ì´í„° ìŠ¤íŠ¸ë¦¼ì¸ ê²½ìš° (ì´ë¦„ì´ ì—†ê±°ë‚˜ ë¹ˆ ë¬¸ìì—´)
+                                        if (string.IsNullOrEmpty(attrName))
+                                        {
+                                            // AllocatedLength ì‹œë„
+                                            var allocatedProp = attr.GetType().GetProperty("AllocatedLength",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (allocatedProp != null)
+                                            {
+                                                var allocatedValue = allocatedProp.GetValue(attr);
+                                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: DataAttr.AllocatedLength = {allocatedValue}");
+                                                if (allocatedValue is long allocatedLen && allocatedLen > 0)
+                                                {
+                                                    result = allocatedLen;
+                                                    debugInfo = $"DataAttr.AllocatedLength: {allocatedLen}";
+                                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                                    return allocatedLen;
+                                                }
+                                            }
+
+                                            // ActualSize ì‹œë„
+                                            var actualSizeProp = attr.GetType().GetProperty("ActualSize",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (actualSizeProp != null)
+                                            {
+                                                var actualValue = actualSizeProp.GetValue(attr);
+                                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: DataAttr.ActualSize = {actualValue}");
+                                                if (actualValue is long actualLen && actualLen > 0)
+                                                {
+                                                    result = actualLen;
+                                                    debugInfo = $"DataAttr.ActualSize: {actualLen}";
+                                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                                    return actualLen;
+                                                }
+                                            }
+
+                                            // Length ì†ì„± ì‹œë„
+                                            var lengthAttrProp = attr.GetType().GetProperty("Length",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (lengthAttrProp != null)
+                                            {
+                                                var lengthValue = lengthAttrProp.GetValue(attr);
+                                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: DataAttr.Length = {lengthValue}");
+                                                if (lengthValue is long attrLen && attrLen > 0)
+                                                {
+                                                    result = attrLen;
+                                                    debugInfo = $"DataAttr.Length: {attrLen}";
+                                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                                    return attrLen;
+                                                }
+                                            }
+                                            
+                                            // ëª¨ë“  ì†ì„± ë‚˜ì—´ (ë””ë²„ê¹…ìš©)
+                                            var allAttrProps = attr.GetType().GetProperties(
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: DataAttr has {allAttrProps.Length} properties");
+                                            foreach (var ap in allAttrProps.Take(10))
+                                            {
+                                                try
+                                                {
+                                                    var apValue = ap.GetValue(attr);
+                                                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: DataAttr.{ap.Name} = {apValue}");
+                                                }
+                                                catch { }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // ê¸°ë³¸ ë°ì´í„° ìŠ¤íŠ¸ë¦¼ì´ ì—†ì–´ë„ ì´ë¦„ ìˆëŠ” DATA ì†ì„± í¬ê¸°ë¥¼ í›„ë³´ë¡œ ì €ì¥
+                                            var allocatedProp = attr.GetType().GetProperty("AllocatedLength",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            TrackCandidate(allocatedProp?.GetValue(attr));
+
+                                            var actualSizeProp = attr.GetType().GetProperty("ActualSize",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            TrackCandidate(actualSizeProp?.GetValue(attr));
+
+                                            var lengthAttrProp = attr.GetType().GetProperty("Length",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            TrackCandidate(lengthAttrProp?.GetValue(attr));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // ADSì¸ ê²½ìš° ì´ë¦„ ë§¤ì¹­
+                                        if (attrName?.Equals(adsName, StringComparison.OrdinalIgnoreCase) == true)
+                                        {
+                                            var allocatedProp = attr.GetType().GetProperty("AllocatedLength",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (allocatedProp?.GetValue(attr) is long allocatedLen && allocatedLen >= 0)
+                                                return allocatedLen;
+
+                                            var actualSizeProp = attr.GetType().GetProperty("ActualSize",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (actualSizeProp?.GetValue(attr) is long actualLen && actualLen >= 0)
+                                                return actualLen;
+
+                                            var lengthAttrProp = attr.GetType().GetProperty("Length",
+                                                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                            if (lengthAttrProp?.GetValue(attr) is long attrLen && attrLen >= 0)
+                                                return attrLen;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (result == 0 && bestDataLength > 0)
+                            {
+                                result = bestDataLength;
+                                debugInfo = $"Fallback DATA attribute length: {bestDataLength}";
+                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                return result;
+                            }
+                        }
+                    }
+                }
             }
             catch { }
 
+            // 3. íŒŒì¼ ìŠ¤íŠ¸ë¦¼ ì—´ì–´ì„œ Length ì½ê¸° (ë§ˆì§€ë§‰ ìˆ˜ë‹¨)
             try
             {
                 using var s = ntfs.OpenFile(path, FileMode.Open, FileAccess.Read);
-                return s.Length;
+                if (s != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Stream opened successfully");
+                    System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Stream.Length = {s.Length}, CanSeek = {s.CanSeek}");
+                    
+                    // Length ì†ì„± í™•ì¸ (0ë³´ë‹¤ í° ê°’ë§Œ ìœ íš¨)
+                    if (s.Length > 0)
+                    {
+                        result = s.Length;
+                        debugInfo = $"Stream.Length: {s.Length}";
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                        return s.Length;
+                    }
+                    else if (s.Length == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Stream.Length is 0, trying Seek method...");
+                    }
+
+                    // Seek ê°€ëŠ¥í•œ ê²½ìš° íŒŒì¼ ëìœ¼ë¡œ ì´ë™í•´ì„œ Position í™•ì¸
+                    if (s.CanSeek)
+                    {
+                        try
+                        {
+                            var originalPos = s.Position;
+                            s.Seek(0, SeekOrigin.End);
+                            var fileSize = s.Position;
+                            s.Position = originalPos;
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Seek to end, Position = {fileSize}");
+                            if (fileSize > 0)
+                            {
+                                result = fileSize;
+                                debugInfo = $"Stream.Seek(End): {fileSize}";
+                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                                return fileSize;
+                            }
+                            else if (fileSize == 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Stream.Seek(End) returned 0");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Seek failed: {ex.Message}");
+                        }
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return 0;
+                System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: Stream open failed: {ex.Message}");
             }
+
+            // 4. Named data streamsì„ ì§ì ‘ ì—´ì–´ë³´ëŠ” ìµœì¢… ì‹œë„ (ì˜ˆ: $Secure:$SDS ë“±)
+            if (result == 0)
+            {
+                bool hasNamedStreams = false;
+                try
+                {
+                    foreach (var stream in ListNamedDataStreams(ntfs, plainPath))
+                    {
+                        hasNamedStreams = true;
+                        try
+                        {
+                            using var s = ntfs.OpenFile($"{plainPath}:{stream}", FileMode.Open, FileAccess.Read);
+                            if (s == null) continue;
+
+                            var len = s.Length;
+                            if (len == 0 && s.CanSeek)
+                            {
+                                var orig = s.Position;
+                                s.Seek(0, SeekOrigin.End);
+                                len = s.Position;
+                                s.Position = orig;
+                            }
+
+                            if (len > result)
+                            {
+                                result = len;
+                                debugInfo = $"Named stream '{stream}' length: {len}";
+                            }
+                        }
+                        catch { }
+                    }
+
+                    if (result > 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                        return result;
+                    }
+
+                    // NTFS ë©”íƒ€íŒŒì¼ì²˜ëŸ¼ ê¸°ë³¸ ë°ì´í„° ìŠ¤íŠ¸ë¦¼ì´ ì—†ì§€ë§Œ ì´ë¦„ ìˆëŠ” ìŠ¤íŠ¸ë¦¼ë§Œ ìˆëŠ” ê²½ìš°,
+                    // FTK ë“±ì—ì„œ 1ë°”ì´íŠ¸ë¡œ í‘œì‹œí•˜ëŠ” ê²ƒê³¼ ë§ì¶”ê¸° ìœ„í•´ ìµœì†Œ 1ë°”ì´íŠ¸ë¡œ ë¦¬í„´.
+                    if (hasNamedStreams && IsRootMetafile(plainPath))
+                    {
+                        result = 1;
+                        debugInfo = "Root metafile with only named streams; returning 1 byte";
+                        System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: SUCCESS - {debugInfo}");
+                        return result;
+                    }
+                }
+                catch { }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[GetFileSizeSafe] {path}: FAILED - All methods returned 0 or failed");
+            return 0;
         }
 
-        // NTFS ½Ã°£(»ı¼º/¼öÁ¤/¾×¼¼½º/MFT ¼öÁ¤)À» Á¾ÇÕÀûÀ¸·Î Ãëµæ
+        // NTFS ï¿½Ã°ï¿½(ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½/ï¿½×¼ï¿½ï¿½ï¿½/MFT ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         public static void GetAllTimes(
             NtfsFileSystem ntfs, string path,
             out DateTime createUtc, out DateTime modifyUtc,
@@ -474,7 +856,7 @@ namespace WinUiApp.Services
             }
         }
 
-        // NTFS ½Ã½ºÅÛ ÆÄÀÏ(¸ŞÅ¸ÆÄÀÏ) ¿©ºÎ È®ÀÎ
+        // NTFS ï¿½Ã½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
         static bool IsRootMetafile(string plainPath)
         {
             if (string.IsNullOrEmpty(plainPath)) return false;
@@ -485,7 +867,7 @@ namespace WinUiApp.Services
             return remainder.StartsWith('$');
         }
 
-        // º¼·ı »ı¼º ½ÃÁ¡À» ÃßÁ¤ÇØ ±âº» ½Ã°£À¸·Î »ç¿ë
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½âº» ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         static DateTime GetVolumeBaseUtc(NtfsFileSystem ntfs)
         {
             var holder = _volBaseTimes.GetOrCreateValue(ntfs);
